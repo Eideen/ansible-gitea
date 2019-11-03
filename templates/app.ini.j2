@@ -1,0 +1,201 @@
+; {{ ansible_managed }}
+; Last updated: {{ ansible_date_time.date }}
+; {{ role_path }}
+
+{% if GITEA_APP_NAME is defined and GITEA_APP_NAME|length > 0 %}
+APP_NAME       = {{ GITEA_APP_NAME }}
+{% endif %}
+{% if GITEA_RUN_USER is defined and GITEA_RUN_USER|length > 0 %}
+RUN_USER       = {{ GITEA_RUN_USER }}
+{% endif %}
+RUN_MODE       = {{ GITEA_RUN_MODE }}
+
+
+[security]
+{% if GITEA_INSTALL_LOCK is defined  %}
+INSTALL_LOCK        = {{ GITEA_INSTALL_LOCK }}
+{% endif %}
+{% if GITEA_SECRET_KEY is defined  %}
+SECRET_KEY          = {{ GITEA_SECRET_KEY }}
+{% endif %}
+{% if GITEA_LOGIN_REMEMBER_DAYS is defined  %}
+LOGIN_REMEMBER_DAYS = {{ GITEA_LOGIN_REMEMBER_DAYS }}
+{% endif %}
+{% if GITEA_INTERNAL_TOKEN is defined  %}
+INTERNAL_TOKEN      = {{ GITEA_INTERNAL_TOKEN }}
+{% endif %}
+
+[database]
+DB_TYPE  = {{ GITEA_DB_TYPE }}
+{% if GITEA_DB_TYPE == "mysql" %}
+HOST     = {{ GITEA_DB_HOST }}
+NAME     = {{ GITEA_DB_NAME }}
+USER     = {{ GITEA_DB_USER }}
+PASSWD   = {{ GITEA_DB_PASSWD }}
+SSL_MODE = {{ GITEA_DB_SSL_MODE }}
+{% endif %}
+{% if GITEA_DB_TYPE == "sqlite3" %}
+PATH     = {{ GITEA_DB_SQLite_path}}
+{% endif %}
+
+{# {% if $1 is defined and variable %} {% endif %} #}
+[repository]
+{% if GITEA_ROOT is defined  %}
+ROOT = {{ GITEA_ROOT }}
+{% endif %}
+{% if GITEA_SCRIPT_TYPE is defined  %}
+SCRIPT_TYPE = {{ GITEA_SCRIPT_TYPE }}
+{% endif %}
+{% if GITEA_ANSI_CHARSET is defined  %}
+ANSI_CHARSET = {{ GITEA_ANSI_CHARSET }}
+{% endif %}
+{% if GITEA_FORCE_PRIVATE is defined  %}
+FORCE_PRIVATE = {{ GITEA_FORCE_PRIVATE }}
+{% endif %}
+{% if GITEA_DEFAULT_PRIVATE is defined  %}
+DEFAULT_PRIVATE = {{ GITEA_DEFAULT_PRIVATE }}
+{% endif %}
+{% if GITEA_MAX_CREATION_LIMIT is defined  %}
+MAX_CREATION_LIMIT = {{ GITEA_MAX_CREATION_LIMIT }}
+{% endif %}
+{% if GITEA_MIRROR_QUEUE_LENGTH is defined  %}
+MIRROR_QUEUE_LENGTH = {{ GITEA_MIRROR_QUEUE_LENGTH }}
+{% endif %}
+{% if GITEA_PULL_REQUEST_QUEUE_LENGTH is defined  %}
+PULL_REQUEST_QUEUE_LENGTH = {{ GITEA_PULL_REQUEST_QUEUE_LENGTH }}
+{% endif %}
+{% if GITEA_PREFERRED_LICENSES is defined  %}
+PREFERRED_LICENSES = {{ GITEA_PREFERRED_LICENSES }}
+{% endif %}
+{% if GITEA_DISABLE_HTTP_GIT is defined  %}
+DISABLE_HTTP_GIT = {{ GITEA_DISABLE_HTTP_GIT }}
+{% endif %}
+{% if GITEA_ACCESS_CONTROL_ALLOW_ORIGIN is defined  %}
+ACCESS_CONTROL_ALLOW_ORIGIN = {{ GITEA_ACCESS_CONTROL_ALLOW_ORIGIN }}
+{% endif %}
+{% if GITEA_USE_COMPAT_SSH_URI is defined  %}
+USE_COMPAT_SSH_URI = {{ GITEA_USE_COMPAT_SSH_URI }}
+{% endif %}
+{% if GITEA_DEFAULT_CLOSE_ISSUES_VIA_COMMITS_IN_ANY_BRANCH is defined  %}
+DEFAULT_CLOSE_ISSUES_VIA_COMMITS_IN_ANY_BRANCH = {{ GITEA_DEFAULT_CLOSE_ISSUES_VIA_COMMITS_IN_ANY_BRANCH }}
+{% endif %}
+
+
+[server]
+{% if GITEA_SSH_DOMAIN is defined  %}
+SSH_DOMAIN       = {{ GITEA_SSH_DOMAIN }}
+{% endif %}
+{% if GITEA_DOMAIN is defined  %}
+DOMAIN           = {{ GITEA_DOMAIN }}
+{% endif %}
+{% if GITEA_HTTP_PORT is defined  %}
+HTTP_PORT        = {{ GITEA_HTTP_PORT }}
+{% endif %}
+{% if GITEA_ROOT_URL is defined  %}
+ROOT_URL         = {{ GITEA_ROOT_URL }}
+{% endif %}
+{% if GITEA_DISABLE_SSH is defined  %}
+DISABLE_SSH      = {{ GITEA_DISABLE_SSH }}
+{% endif %}
+{% if GITEA_SSH_PORT is defined  %}
+SSH_PORT         = {{ GITEA_SSH_PORT }}
+{% endif %}
+{% if GITEA_LFS_START_SERVER is defined  %}
+LFS_START_SERVER = {{ GITEA_LFS_START_SERVER }}
+{% endif %}
+{% if GITEA_LFS_CONTENT_PATH is defined  %}
+LFS_CONTENT_PATH = {{ GITEA_LFS_CONTENT_PATH }}
+{% endif %}
+{% if GITEA_LFS_JWT_SECRET is defined  %}
+LFS_JWT_SECRET   = {{ GITEA_LFS_JWT_SECRET }}
+{% endif %}
+{% if GITEA_OFFLINE_MODE is defined  %}
+OFFLINE_MODE     = {{ GITEA_OFFLINE_MODE }}
+{% endif %}
+
+[mailer]
+{% if GITEA_mailer_ENABLED is defined  %}
+ENABLED = {{ GITEA_mailer_ENABLED }}
+{% endif %}
+{% if GITEA_mailer_ENABLED %}
+{% if GITEA_mailer_HOST is defined  %}
+HOST    = {{ GITEA_mailer_HOST }}
+{% endif %}
+{% if GITEA_mailer_FROM is defined  %}
+FROM    = {{ GITEA_mailer_FROM }}
+{% endif %}
+{% if GITEA_mailer_USER is defined  %}
+USER    = {{ GITEA_mailer_USER }}
+{% endif %}
+{% if GITEA_mailer_PASSWD is defined  %}
+PASSWD  = {{ GITEA_mailer_PASSWD }}
+{% endif %}
+{% endif %}
+
+[service]
+{% if GITEA_REGISTER_EMAIL_CONFIRM is defined  %}
+REGISTER_EMAIL_CONFIRM            = {{ GITEA_REGISTER_EMAIL_CONFIRM }}
+{% endif %}
+{% if GITEA_ENABLE_NOTIFY_MAIL is defined  %}
+ENABLE_NOTIFY_MAIL                = {{ GITEA_ENABLE_NOTIFY_MAIL }}
+{% endif %}
+{% if GITEA_DISABLE_REGISTRATION is defined  %}
+DISABLE_REGISTRATION              = {{ GITEA_DISABLE_REGISTRATION }}
+{% endif %}
+{% if GITEA_ALLOW_ONLY_EXTERNAL_REGISTRATION is defined  %}
+ALLOW_ONLY_EXTERNAL_REGISTRATION  = {{ GITEA_ALLOW_ONLY_EXTERNAL_REGISTRATION }}
+{% endif %}
+{% if GITEA_ENABLE_CAPTCHA is defined  %}
+ENABLE_CAPTCHA                    = {{ GITEA_ENABLE_CAPTCHA }}
+{% endif %}
+{% if GITEA_REQUIRE_SIGNIN_VIEW is defined  %}
+REQUIRE_SIGNIN_VIEW               = {{ GITEA_REQUIRE_SIGNIN_VIEW }}
+{% endif %}
+{% if GITEA_DEFAULT_KEEP_EMAIL_PRIVATE is defined  %}
+DEFAULT_KEEP_EMAIL_PRIVATE        = {{ GITEA_DEFAULT_KEEP_EMAIL_PRIVATE }}
+{% endif %}
+{% if GITEA_DEFAULT_ALLOW_CREATE_ORGANIZATION is defined  %}
+DEFAULT_ALLOW_CREATE_ORGANIZATION = {{ GITEA_DEFAULT_ALLOW_CREATE_ORGANIZATION }}
+{% endif %}
+{% if GITEA_DEFAULT_ENABLE_TIMETRACKING is defined  %}
+DEFAULT_ENABLE_TIMETRACKING       = {{ GITEA_DEFAULT_ENABLE_TIMETRACKING }}
+{% endif %}
+{% if GITEA_NO_REPLY_ADDRESS is defined  %}
+NO_REPLY_ADDRESS                  = {{ GITEA_NO_REPLY_ADDRESS }}
+{% endif %}
+
+[picture]
+{% if GITEA_DISABLE_GRAVATAR is defined  %}
+DISABLE_GRAVATAR        = {{ GITEA_DISABLE_GRAVATAR }}
+{% endif %}
+{% if GITEA_ENABLE_FEDERATED_AVATAR is defined  %}
+ENABLE_FEDERATED_AVATAR = {{ GITEA_ENABLE_FEDERATED_AVATAR }}
+{% endif %}
+
+[openid]
+{% if GITEA_ENABLE_OPENID_SIGNIN is defined  %}
+ENABLE_OPENID_SIGNIN = {{ GITEA_ENABLE_OPENID_SIGNIN }}
+{% endif %}
+{% if GITEA_ENABLE_OPENID_SIGNUP is defined  %}
+ENABLE_OPENID_SIGNUP = {{ GITEA_ENABLE_OPENID_SIGNUP }}
+{% endif %}
+
+[session]
+{% if GITEA_PROVIDER is defined  %}
+PROVIDER = {{ GITEA_PROVIDER }}
+{% endif %}
+
+[log]
+{% if GITEA_log_MODE is defined  %}
+MODE  = {{ GITEA_log_MODE }}
+{% endif %}
+{% if GITEA_log_level is defined  %}
+level = {{ GITEA_log_level }}
+{% endif %}
+{% if GITEA_log_ROOT_PATH is defined  %}
+ROOT_PATH = {{ GITEA_log_ROOT_PATH }}
+{% endif %}
+
+
+[oauth2]
+JWT_SECRET = {{ GITEA_JWT_SECRET }}

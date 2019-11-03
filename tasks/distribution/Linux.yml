@@ -1,0 +1,195 @@
+# ---
+# # tasks file for ansible-gitea
+#
+
+- name: Make Gitea user
+  user:
+    name: "{{ GITEA_user }}"
+    shell: "/bin/false"
+    groups: "{{ GITEA_group }}"
+    append: yes
+    home: "{{ GITEA_home }}"
+    create_home: yes
+    comment: "user for running gitea"
+  when: not GITEA_user == "root"
+  become: true
+
+# "ansible_userspace_architecture": "x86_64",
+# "ansible_machine": "armv7l",
+
+- name: check if GITea file exists
+  stat:
+    path: "{{ GITEA_file }}"
+  register: GITEA_file_stat
+
+
+- name: Register local version
+  shell: "{{GITEA_file}} -v | awk '{print $3}'"
+  register: GTlocalV
+  when: GITEA_file_stat.stat.exists|bool
+  changed_when: False
+
+- name: Set fact when is linux-amd64
+  set_fact:
+   gtsystem: "linux-amd64"
+  when: ansible_machine == "x86_64"
+
+
+- name: Set fact when is linux-amd64
+  set_fact:
+   GTlocalV: "{{GTlocalV.stdout}}"
+  when: GITEA_file_stat.stat.exists|bool
+
+## legg til regel for når det ikke er http oppe.
+
+- name: Get github GITea version
+  uri:
+    url: "{{GITEA_github_url}}"
+    body_format: json
+    return_content: yes
+  register: github_version
+
+
+- name: If not update, set variable
+  set_fact:
+   giteaOLD: True
+  when: GTlocalV is version(github_version.json.tag_name[1:], '<')
+
+- name: Current version is up to date
+  debug:
+    msg:
+      - "Current version is up to date"
+      - "Github version: {{ github_version.json.tag_name[1:] }}"
+      - " local version: {{GTlocalV}}"
+      - "     local arc: {{ gtsystem }}"
+  when: GTlocalV is version(github_version.json.tag_name[1:], '>=')
+  ignore_errors: True
+
+
+- name: stop gitea.service
+  become: true
+  systemd:
+    name: gitea.service
+    state: stopped
+  when: giteaOLD|bool
+  become: true
+
+- name: Download the Gitea checksum
+  get_url:
+    url: "http://github.com/go-gitea/gitea/releases/download/{{github_version.json.tag_name}}/gitea-{{github_version.json.tag_name[1:]}}-{{gtsystem}}.xz.sha256"
+    dest: /tmp/gitea.xz.sha256
+  when: giteaOLD|bool
+
+- name: Register the checksum value
+  shell: cat /tmp/gitea.xz.sha256 | awk '{ print $1 }'
+  register: GITeaSHA256
+  when: giteaOLD|bool
+
+- name: Geting GITea
+  become: true
+  get_url:
+    url: "http://github.com/go-gitea/gitea/releases/download/{{github_version.json.tag_name}}/gitea-{{github_version.json.tag_name[1:]}}-{{gtsystem}}.xz"
+    checksum: sha256:{{ GITeaSHA256.stdout }}
+    dest: "{{GITEA_file}}.xz"
+  when: giteaOLD|bool
+  become: true
+
+- name: unpacking Gitea
+  become: true
+  shell: xz -d -f {{GITEA_file}}.xz
+  when: giteaOLD|bool
+
+- name: move Gitea
+  shell: mv /tmp/gitea {{ GITEA_file }}
+  notice:
+    - gitea restarted
+  when: giteaOLD|bool
+  become: true
+
+- name: Gitea work directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ GITEA_user }}"
+    group: "{{ GITEA_group }}"
+    mode: "{{ 0750 }}"
+    recurse: yes
+  with_items: "{{ GITEA_directories }}, {{ GITEA_log_ROOT_PATH }}"
+  become: true
+
+- name: Gitea work directories
+  stat:
+    path: "{{GITEA_ROOT}}"
+  register: GITEA_ROOT_s
+
+- debug:
+   msg: "{{GITEA_ROOT_s}}"
+
+- name: "btrfs make subvolum for GITea"
+  shell: "btrfs subvolume create {{GITEA_ROOT}}"
+  notice:
+    - gitea restarted
+  when: GTbtrfsUSE|bool and not GITEA_ROOT_s.stat.exists|bool
+  become: true
+
+- name: set permisions for storage path
+  file:
+    path: "{{GITEA_ROOT}}"
+    state: directory
+    owner: "{{ GITEA_user }}"
+    group: "{{ GITEA_group }}"
+    mode: "{{ 0750 }}"
+  become: true
+
+- name: find subfolders
+  register: GITEA_ROOT_subfolders
+  become: true
+  find:
+    paths: "{{GITEA_ROOT}}/"
+    hidden: yes
+    excludes:
+     - ".snapshots"
+
+- name: set permisions for storage path subfolders
+  file:
+    path: "{{item.path }}"
+    owner: "{{ GITEA_user }}"
+    group: "{{ GITEA_group }}"
+    mode: "{{ 0750 }}"
+  become: true
+  with_items: "{{GITEA_ROOT_subfolders.files}}"
+
+- name: Gitea config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+    group: "{{ GITEA_group }}"
+    mode: "{{ 0770 }}"
+    recurse: yes
+  with_items: "{{ GITEA_config_path }}"
+  become: true
+
+
+- name: "Gitea config file"
+  template:
+     src: app.ini.j2
+     dest: "/etc/gitea/app.ini"
+     mode: "{{ 0770 }}"
+     backup: yes
+  become: true
+
+
+- name: "Gitea systemd service"
+  template:
+    src: "{{ item }}"
+    dest: "/lib/systemd/system/gitea.service"
+  with_items: gitea.service.j2
+  notice:
+    - systemd deamon reload
+    - gitea restarted
+    - enable service gitea and ensure it is not masked
+  become: true
+
+- name: include fail2ban task
+  include_tasks: "fail2ban.yml"

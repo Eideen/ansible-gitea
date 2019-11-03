@@ -1,2 +1,143 @@
 ---
 # defaults file for ansible-gitea
+# default/main.yml
+# https://docs.gitea.io/en-us/config-cheat-sheet/
+
+ansible_managed: 'This file is managed by Ansible, all changes will be lost'
+
+GITEA_github_url: https://api.github.com/repos/go-gitea/gitea/releases/latest
+tmp: /tmp
+GITEA_file: /usr/local/bin/gitea
+
+GITEA_nice_lvl: 19
+GITEA_restart_mode: always
+GITEA_restart_delay: 30
+
+GITEA_user: git
+GITEA_group: git
+GITEA_home: /home/git
+GITEA_WORK_DIR: /var/lib/gitea/
+
+GITEA_directories:
+  - /var/lib/gitea/custom
+  - /var/lib/gitea/data
+
+# GITEA_apache_allow:
+#   - 127.0.0.0/8
+#   - 192.168.0.0/16
+#   - 79.160.0.0/15
+apache_sites: /etc/apache2/sites-available/
+#SSLCertificate_folder:
+GITEA_apache_sites:
+  - {src: 030-gitea.conf.j2, dest: 030-gitea.conf}
+#  - {src: 031-gitea.ssl.conf.j2, dest: 031-gitea.ssl.conf}
+
+GITEA_fail2ban_enabled: false
+GITEA_fail2ban_conf:
+  - {src: fail2ban/filter.d/gitea.conf.j2, dest: /etc/fail2ban/filter.d/gitea.conf}
+  - {src: fail2ban/jail.d/gitea.conf, dest: /etc/fail2ban/jail.d/gitea.conf}
+# LEVEL: Info: General log level. [Trace, Debug, Info, Warn, Error, Critical, Fatal, None]
+
+GITEA_data_path:
+GITEA_config_path: /etc/gitea
+
+#[repository]
+GITEA_use_btrfs_for_root: false
+GITEA_ROOT: /home/git/gitea-repositories/
+# GITEA_SCRIPT_TYPE:
+# GITEA_ANSI_CHARSET:
+# GITEA_FORCE_PRIVATE:
+# GITEA_DEFAULT_PRIVATE:
+# GITEA_MAX_CREATION_LIMIT:
+# GITEA_PULL_REQUEST_QUEUE_LENGTH:
+# GITEA_MIRROR_QUEUE_LENGTH:
+# GITEA_PREFERRED_LICENSES:
+# GITEA_DISABLE_HTTP_GIT:
+# GITEA_USE_COMPAT_SSH_URI:
+# GITEA_ACCESS_CONTROL_ALLOW_ORIGIN:
+# GITEA_DEFAULT_CLOSE_ISSUES_VIA_COMMITS_IN_ANY_BRANCH:
+
+#[DEFAULT]
+GITEA_APP_NAME: "Eideens's git rep"
+GITEA_RUN_USER: git
+GITEA_RUN_MODE: prod
+
+#[security]
+# org token
+# GITEA_INSTALL_LOCK: true
+# GITEA_SECRET_KEY:
+# GITEA_LOGIN_REMEMBER_DAYS: 31
+# GITEA_INTERNAL_TOKEN:
+
+#[database]
+
+# [mysql, postgres, mssql, sqlite3]
+GITEA_DB_TYPE: sqlite3
+# GITEA_DB_HOST: localhost
+# GITEA_DB_NAME: gitea
+# GITEA_DB_USER: gitea
+# GITEA_DB_PASSWD: password
+# GITEA_DB_SSL_MODE: disable
+GITEA_DB_SQLite_path: data/gitea.db
+#PATH: data/gitea.db
+
+#[log]
+GITEA_log_level: Debug
+GITEA_log_MODE: file
+GITEA_log_ROOT_PATH: /var/log/gitea
+
+##[server]
+GITEA_SSH_DOMAIN: example
+GITEA_DOMAIN: example
+GITEA_HTTP_PORT: 3000
+
+GITEA_ROOT_URL: https://gitea.example.org/
+GITEA_ROOT_URL_frontend: gitea.example.org
+GITEA_version_url:
+GITEA_DISABLE_SSH: false
+GITEA_SSH_PORT: 22
+GITEA_LFS_START_SERVER: true
+GITEA_LFS_CONTENT_PATH: /volum1/@gitREP/lfs
+GITEA_LFS_JWT_SECRET:
+GITEA_OFFLINE_MODE: false
+
+
+#[mailer]
+GITEA_mailer_ENABLED: false
+GITEA_mailer_HOST: example.org
+GITEA_mailer_FROM: git@example.org
+GITEA_mailer_USER: example
+GITEA_mailer_PASSWD: example
+
+
+
+#[service]
+# GITEA_REGISTER_EMAIL_CONFIRM: false
+# GITEA_ENABLE_NOTIFY_MAIL: false
+# GITEA_DISABLE_REGISTRATION: false
+# GITEA_ENABLE_CAPTCHA: false
+# GITEA_REQUIRE_SIGNIN_VIEW: false
+# GITEA_DEFAULT_KEEP_EMAIL_PRIVATE: false
+# GITEA_DEFAULT_ALLOW_CREATE_ORGANIZATION: true
+# GITEA_DEFAULT_ENABLE_TIMETRACKING: true
+# GITEA_NO_REPLY_ADDRESS: noreply.example.org
+
+#[picture]
+# GITEA_DISABLE_GRAVATAR: false
+# GITEA_ENABLE_FEDERATED_AVATAR: true
+
+#[openid]
+# GITEA_ENABLE_OPENID_SIGNIN: true
+# GITEA_ENABLE_OPENID_SIGNUP: true
+
+#[session]
+# GITEA_PROVIDER: file
+
+
+
+#[oauth2]
+# GITEA_JWT_SECRET:
+
+GTlocalV: 0.0.0
+giteaOLD: false
+GTbtrfsUSE: false

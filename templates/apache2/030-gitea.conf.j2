@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+<VirtualHost *:80>
+  ServerName {{ GITEA_ROOT_URL_frontend }}
+
+  {% if GITEA_apache_allow is defined %}
+  <Proxy *>
+                Order Allow,Deny
+              {% for item in GITEA_apache_allow  %}
+              Allow from {{ item }}
+              {% endfor %}
+  </Proxy>
+  {% endif %}
+  ProxyPreserveHost On
+  ProxyRequests off
+  ProxyPass / http://localhost:{{ GITEA_HTTP_PORT }}/
+  ProxyPassReverse / http://localhost:{{ GITEA_HTTP_PORT }}/
+
+  ErrorLog ${APACHE_LOG_DIR}/gitea-ssl-error.log
+  CustomLog ${APACHE_LOG_DIR}/gitea-ssl-access.log combined
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" vhost_combined
+  LogFormat "%v %h %l %u %t \"%r\" %>s %b" vhost_common
+</VirtualHost>

@@ -1,0 +1,25 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Gitea (Git with a cup of tea)
+After=syslog.target
+After=network.target
+{% if GITEA_DB_TYPE == "mysql" %}
+Requires=mariadb.service
+{% endif %}
+
+
+
+[Service]
+RestartSec={{ GITEA_restart_delay }}s
+Type=simple
+User={{ GITEA_user }}
+Group={{ GITEA_group }}
+WorkingDirectory= {{ GITEA_WORK_DIR }}
+ExecStart={{ GITEA_file }} web -c {{ GITEA_config_path }}/app.ini
+Restart={{ GITEA_restart_mode }}
+Environment=USER={{ GITEA_user }} HOME={{ GITEA_home }} GITEA_WORK_DIR={{ GITEA_WORK_DIR }}
+Nice={{GITEA_nice_lvl}}
+
+[Install]
+WantedBy=multi-user.target

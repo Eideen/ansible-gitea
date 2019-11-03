@@ -1,0 +1,26 @@
+---
+# tasks file for ansible-gitea
+- name: install fail2ban
+  package:
+   name: fail2ban
+   state: present
+  when: GITEA_fail2ban_enabled|bool
+  become: true
+
+- name: "fail2ban config file"
+  template:
+     src: "{{ item.src }}"
+     dest: "{{ item.dest }}"
+  with_items: "{{ GITEA_fail2ban_conf }}"
+  when: GITEA_fail2ban_enabled|bool
+  notify: fail2ban restart
+  become: true
+
+- name: "fail2ban config file removed"
+  file:
+    path: "{{ item.dest }}"
+    state: absent
+  when: not GITEA_fail2ban_enabled|bool
+  with_items: "{{ GITEA_fail2ban_conf }}"
+  notify: fail2ban restart
+  become: true
